@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wangwi.miaosha.mapper.SequenceInfoPOMapper">
+  <resultMap id="BaseResultMap" type="com.wangwi.miaosha.entity.po.SequenceInfoPO">
+    <constructor>
+      <idArg column="sequence_name" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="current_value" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="increase_step" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="max_value" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="init_value" javaType="java.lang.Integer" jdbcType="INTEGER" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List">
+    sequence_name, current_value, increase_step, max_value, init_value
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sequence_info
+    where sequence_name = #{sequenceName,jdbcType=VARCHAR}
+  </select>
+  <!--
+    使用select…for update会把数据给锁住，不过我们需要注意一些锁的级别，
+    MySQL InnoDB默认Row-Level Lock，所以只有「明确」地指定主键，MySQL 才会执行Row lock (只锁住被选取的数据) ，
+    否则MySQL 将会执行Table Lock (将整个数据表单给锁住)
+    原文链接：https://blog.csdn.net/HEYUTAO007/article/details/51729456
+  -->
+  <!--    SequenceInfoPO getCurrentValueByName(String sequenceName);-->
+  <select id="getCurrentValueByName" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sequence_info
+    where sequence_name = #{sequenceName} for update
+ </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from sequence_info
+    where sequence_name = #{sequenceName,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.wangwi.miaosha.entity.po.SequenceInfoPO">
+    insert into sequence_info (sequence_name, current_value, increase_step, 
+      max_value, init_value)
+    values (#{sequenceName,jdbcType=VARCHAR}, #{currentValue,jdbcType=INTEGER}, #{increaseStep,jdbcType=INTEGER}, 
+      #{maxValue,jdbcType=INTEGER}, #{initValue,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wangwi.miaosha.entity.po.SequenceInfoPO">
+    insert into sequence_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="sequenceName != null">
+        sequence_name,
+      </if>
+      <if test="currentValue != null">
+        current_value,
+      </if>
+      <if test="increaseStep != null">
+        increase_step,
+      </if>
+      <if test="maxValue != null">
+        max_value,
+      </if>
+      <if test="initValue != null">
+        init_value,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="sequenceName != null">
+        #{sequenceName,jdbcType=VARCHAR},
+      </if>
+      <if test="currentValue != null">
+        #{currentValue,jdbcType=INTEGER},
+      </if>
+      <if test="increaseStep != null">
+        #{increaseStep,jdbcType=INTEGER},
+      </if>
+      <if test="maxValue != null">
+        #{maxValue,jdbcType=INTEGER},
+      </if>
+      <if test="initValue != null">
+        #{initValue,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wangwi.miaosha.entity.po.SequenceInfoPO">
+    update sequence_info
+    <set>
+      <if test="currentValue != null">
+        current_value = #{currentValue,jdbcType=INTEGER},
+      </if>
+      <if test="increaseStep != null">
+        increase_step = #{increaseStep,jdbcType=INTEGER},
+      </if>
+      <if test="maxValue != null">
+        max_value = #{maxValue,jdbcType=INTEGER},
+      </if>
+      <if test="initValue != null">
+        init_value = #{initValue,jdbcType=INTEGER},
+      </if>
+    </set>
+    where sequence_name = #{sequenceName,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wangwi.miaosha.entity.po.SequenceInfoPO">
+    update sequence_info
+    set current_value = #{currentValue,jdbcType=INTEGER},
+      increase_step = #{increaseStep,jdbcType=INTEGER},
+      max_value = #{maxValue,jdbcType=INTEGER},
+      init_value = #{initValue,jdbcType=INTEGER}
+    where sequence_name = #{sequenceName,jdbcType=VARCHAR}
+  </update>
+</mapper>

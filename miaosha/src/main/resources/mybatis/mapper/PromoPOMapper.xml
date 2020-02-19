@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wangwi.miaosha.mapper.PromoPOMapper">
+  <resultMap id="BaseResultMap" type="com.wangwi.miaosha.entity.po.PromoPO">
+    <constructor>
+      <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="promo_name" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="item_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="promo_price" javaType="java.lang.Double" jdbcType="DOUBLE" />
+      <arg column="start_time" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="end_time" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, promo_name, item_id, promo_price, start_time, end_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from promo
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <!--    PromoPO selectByItemId(Integer itemId);-->
+  <select id="selectByItemId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from promo
+    where item_id = #{itemId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from promo
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wangwi.miaosha.entity.po.PromoPO" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    insert into promo (id, promo_name, item_id, 
+      promo_price, start_time, end_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{promoName,jdbcType=VARCHAR}, #{itemId,jdbcType=INTEGER}, 
+      #{promoPrice,jdbcType=DOUBLE}, #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.wangwi.miaosha.entity.po.PromoPO" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+    insert into promo
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="promoName != null">
+        promo_name,
+      </if>
+      <if test="itemId != null">
+        item_id,
+      </if>
+      <if test="promoPrice != null">
+        promo_price,
+      </if>
+      <if test="startTime != null">
+        start_time,
+      </if>
+      <if test="endTime != null">
+        end_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="promoName != null">
+        #{promoName,jdbcType=VARCHAR},
+      </if>
+      <if test="itemId != null">
+        #{itemId,jdbcType=INTEGER},
+      </if>
+      <if test="promoPrice != null">
+        #{promoPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="startTime != null">
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wangwi.miaosha.entity.po.PromoPO">
+    update promo
+    <set>
+      <if test="promoName != null">
+        promo_name = #{promoName,jdbcType=VARCHAR},
+      </if>
+      <if test="itemId != null">
+        item_id = #{itemId,jdbcType=INTEGER},
+      </if>
+      <if test="promoPrice != null">
+        promo_price = #{promoPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="startTime != null">
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wangwi.miaosha.entity.po.PromoPO">
+    update promo
+    set promo_name = #{promoName,jdbcType=VARCHAR},
+      item_id = #{itemId,jdbcType=INTEGER},
+      promo_price = #{promoPrice,jdbcType=DOUBLE},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

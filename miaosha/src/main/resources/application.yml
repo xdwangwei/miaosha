@@ -1,0 +1,22 @@
+server:
+  port: 9000
+
+mybatis:
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  configuration:
+#   开启驼峰命名和数据库下划线自动映射
+    map-underscore-to-camel-case: true
+
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    username: root
+    password: ******
+    url: jdbc:mysql://localhost/miaosha?useSSL=FALSE&serverTimezone=Asia/Shanghai
+
+  redis:
+    port: XXXX
+    database: 0
+    host: X.X.X.X
+    
+aliyun.shortmsg.appcode: XXXXXXXXXXXXXXXXXXXXXXXXX

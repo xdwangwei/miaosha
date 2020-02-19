@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wangwi.miaosha.mapper.OrderPOMapper">
+  <resultMap id="BaseResultMap" type="com.wangwi.miaosha.entity.po.OrderPO">
+    <constructor>
+      <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="order_no" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="user_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="item_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="item_price" javaType="java.lang.Double" jdbcType="DOUBLE" />
+      <arg column="amount" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="order_price" javaType="java.lang.Double" jdbcType="DOUBLE" />
+      <arg column="promo_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, order_no, user_id, item_id, item_price, amount, order_price, promo_id
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from orders
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from orders
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wangwi.miaosha.entity.po.OrderPO" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    insert into orders (id, order_no, user_id, 
+      item_id, item_price, amount, 
+      order_price, promo_id)
+    values (#{id,jdbcType=INTEGER}, #{orderNo,jdbcType=VARCHAR}, #{userId,jdbcType=INTEGER}, 
+      #{itemId,jdbcType=INTEGER}, #{itemPrice,jdbcType=DOUBLE}, #{amount,jdbcType=INTEGER}, 
+      #{orderPrice,jdbcType=DOUBLE},#{promoId,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wangwi.miaosha.entity.po.OrderPO" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+    insert into orders
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="orderNo != null">
+        order_no,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="itemId != null">
+        item_id,
+      </if>
+      <if test="itemPrice != null">
+        item_price,
+      </if>
+      <if test="amount != null">
+        amount,
+      </if>
+      <if test="orderPrice != null">
+        order_price,
+      </if>
+      <if test="promoId != null">
+        promo_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="orderNo != null">
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="itemId != null">
+        #{itemId,jdbcType=INTEGER},
+      </if>
+      <if test="itemPrice != null">
+        #{itemPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="amount != null">
+        #{amount,jdbcType=INTEGER},
+      </if>
+      <if test="orderPrice != null">
+        #{orderPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="promoId != null">
+        #{promoId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wangwi.miaosha.entity.po.OrderPO">
+    update orders
+    <set>
+      <if test="orderNo != null">
+        order_no = #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="itemId != null">
+        item_id = #{itemId,jdbcType=INTEGER},
+      </if>
+      <if test="itemPrice != null">
+        item_price = #{itemPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="amount != null">
+        amount = #{amount,jdbcType=INTEGER},
+      </if>
+      <if test="orderPrice != null">
+        order_price = #{orderPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="promoId != null">
+        promo_id = #{promoId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wangwi.miaosha.entity.po.OrderPO">
+    update orders
+    set order_no = #{orderNo,jdbcType=VARCHAR},
+      user_id = #{userId,jdbcType=INTEGER},
+      item_id = #{itemId,jdbcType=INTEGER},
+      item_price = #{itemPrice,jdbcType=DOUBLE},
+      amount = #{amount,jdbcType=INTEGER},
+      order_price = #{orderPrice,jdbcType=DOUBLE},
+      promo_id = #{promoId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
