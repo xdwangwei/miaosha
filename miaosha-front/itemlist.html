@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>商品列表</title>
+    <link rel="stylesheet" href="static\assets\global\plugins\bootstrap\css\bootstrap.min.css">
+    <link rel="stylesheet" href="static\assets\global\css\components.css">
+    <link rel="stylesheet" href="static\assets\admin\pages\css\login.css">
+    <script src="static\assets\global\plugins\jquery-1.11.0.min.js"></script>
+</head>
+<body>
+    <div class="content">
+        <h3>商品列表</h3><br>
+        <div  class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>商品名称</th>
+                        <th>商品图片</th>
+                        <th>商品描述</th>
+                        <th>商品价格</th>
+                        <th>商品销量</th>
+                        <th>商品库存</th>
+                    </tr>
+                </thead>
+                <tbody id="item_table">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        $(function(){
+            var g_item_list = [];
+
+            /* 页面加载完成，发送ajax请求，获取商品列表 */
+            $.ajax({
+                method: "GET",
+                url: "http://localhost:9000/item/list",
+                // contentType: "application/x-www-form-urlencoded"
+                success: function(res) {
+                    if(res.status == "success"){
+                        g_item_list = res.data;
+                        reloadTable();
+                    }
+                        
+                    if(res.status == "fail")
+                        alert(res.data.errorMsg);
+                },
+                error: function(){
+                    alert("操作失败，请重试");
+                }
+            });
+            // 重新渲染表格
+            function reloadTable(){
+                for(var i = 0; i < g_item_list.length; i++){
+                    // 遍历每一个商品信息对象itemVO
+                    var itemVO = g_item_list[i];
+                    // 构造<td></td>
+                    var titleTd = $("<td></td>").append(itemVO.title);
+                    var imgUrlTd = $("<td></td>").append('<img style="width: 100px; height: auto;" src="'+itemVO.imgUrl+'">');
+                    var descriptionTd = $("<td></td>").append(itemVO.description);
+                    var priceTd = $("<td></td>").append(itemVO.price);
+                    var salesTd = $("<td></td>").append(itemVO.sales);
+                    var stockTd = $("<td></td>").append(itemVO.stock);
+                    var itemTr = $("<tr></tr>").append(titleTd).append(imgUrlTd).append(descriptionTd).append(priceTd).append(salesTd).append(stockTd);
+                    // 组成<tr></tr>，给其增加id，用以选择，添加单击事件，并通过自定义属性，把此商品的id绑定上
+                    itemTr.attr("id", "item_" + itemVO.id).attr("item_id", itemVO.id);
+                    // 将此<tr></tr>添加到表格
+                    $("#item_table").append(itemTr);
+                    // 给其绑定单击事件，跳转到此商品的详情页面，携带此商品的id
+                    $(itemTr).click(function(e){
+                        window.location.href="item.html?id="+$(this).attr("item_id");
+                    })
+                }
+            }
+        });
+    </script>
+</body>
+</html>

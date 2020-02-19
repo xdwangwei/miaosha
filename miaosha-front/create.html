@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>商品创建</title>
+    <link rel="stylesheet" href="static\assets\global\plugins\bootstrap\css\bootstrap.min.css">
+    <link rel="stylesheet" href="static\assets\global\css\components.css">
+    <link rel="stylesheet" href="static\assets\admin\pages\css\login.css">
+    <script src="static\assets\global\plugins\jquery-1.11.0.min.js"></script>
+</head>
+<body class="login">
+    <div class="content">
+        <h3 class="form-title">商品创建</h3>
+            <div class="form-group">
+                <label class="control-label">商品标题</label>
+                <div>
+                    <input class="form-control" id="input_title" type="text" placeholder="title" name="title"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">头图路径</label>
+                <div>
+                    <input class="form-control" type="text" placeholder="http://www.baidu.com/haha.jpg" id="input_img_url" name="imgUrl"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">商品描述</label>
+                <div>
+                    <div>
+                        <input class="form-control" type="text" placeholder="description" id="input_desciption" name="description"/>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">商品价格</label>
+                <div>
+                    <input class="form-control" type="text" placeholder="99.98" id="input_price" name="price"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">商品库存</label>
+                <div>
+                    <input class="form-control" type="text" placeholder="10000" id="input_stock" name="stock">
+                </div>
+            </div>
+        <div  class="form-actions">
+            <button class="btn blue" id="btn_create" style="width: -webkit-fill-available;">提交</button>
+        </div>
+    </div>
+
+    <script>
+        $(function(){
+            /* 点击提交按钮，创建商品条目 */
+            $("#btn_create").click(function(){
+                // 获取输入的商品标题
+                var title = $("#input_title").val();
+                if(title == null || title == ""){
+                    alert("请输入商品标题");
+                    return false;
+                };
+                // 获取输入的商品头图路径
+                var imgUrl = $("#input_img_url").val();
+                if(imgUrl == null || imgUrl == ""){
+                    alert("请输入商品头图路径");
+                    return false;
+                };
+                // 获取输入的商品描述
+                var description = $("#input_desciption").val();
+                if(description == null || description == ""){
+                    alert("请输入商品描述");
+                    return false;
+                };
+                // 获取输入的商品价格
+                var price = $("#input_price").val();
+                if(price == null || price == ""){
+                    alert("请输入商品价格");
+                    return false;
+                };
+                // 获取输入的商品库存
+                var stock = $("#input_stock").val();
+                if(stock == null || stock == "" || parseInt(stock) < 0){
+                    alert("请输入商品库存(不能小于0)");
+                    return false;
+                };
+                $.ajax({
+                    method: "POST",
+                    url: "http://localhost:9000/item/create",
+                    // contentType: "application/x-www-form-urlencoded"
+                    data: {
+                        "title": title,
+                        "imgUrl": imgUrl,
+                        "description": description,
+                        "price": price,
+                        "stock": stock,
+                    },
+                    success: function(res) {
+                        if(res.status == "success")
+                            alert("商品添加成功！");
+                            // window.location.href="login.html";
+                        if(res.status == "fail")
+                            alert(res.data.errorMsg);
+                    },
+                    error: function(){
+                        alert("操作失败，请重试");
+                    }
+                });
+                // 禁用默认行为
+                // return false;
+            })
+        })
+    </script>
+</body>
+</html>

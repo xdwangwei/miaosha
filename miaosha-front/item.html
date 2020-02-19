@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>商品详情及下单</title>
+    <link rel="stylesheet" href="static\assets\global\plugins\bootstrap\css\bootstrap.min.css">
+    <link rel="stylesheet" href="static\assets\global\css\components.css">
+    <link rel="stylesheet" href="static\assets\admin\pages\css\login.css">
+    <script src="static\assets\global\plugins\jquery-1.11.0.min.js"></script>
+</head>
+<body class="login">
+    <div class="content">
+        <h3 class="form-title">商品及下单</h3>
+            <div id="div_miaosha_message" class="form-group">
+                <div>
+                    <label style="color: red;" class="control-label" id="label_miaosha_message"></label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div>
+                    <label class="control-label" id="label_title"></label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div>
+                    <img style="width: 200px; height: auto;" id="img_url">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">商品描述</label>
+                <div>
+                    <label class="control-label" id="label_description"></label>
+                </div>
+            </div>
+            <div id="div_item_price" class="form-group">
+                <label class="control-label">商品价格</label>
+                <div>
+                    <label class="control-label" id="label_price"></label>
+                </div>
+            </div>
+            <div id="div_miaosha_price" class="form-group" style="color: red;">
+                <label class="control-label">秒杀价格</label>
+                <div>
+                    <label class="control-label" id="label_miaosha_price"></label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">商品销量</label>
+                <div>
+                    <label class="control-label" id="label_sales"></label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">商品库存</label>
+                <div>
+                    <label class="control-label" id="label_stock"></label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">购买数量</label>
+                <div>
+                    <input class="form-control" id="input_amount" placeholder="可以填，用1测试秒杀" disabled value="1"></input>
+                </div>
+            </div>
+            <div  class="form-actions">
+                <button class="btn green" id="btn_order_create" style="width: -webkit-fill-available;">赶紧买1个</button>
+            </div>
+    </div>
+
+    <script>
+        $(function(){
+
+            var item = {};
+            // 全局定时器
+            var intervalId;
+
+            // 根据地址，取出item_id
+            // file:///D:/devTools/ideaFile/project/imooc/miaosha-front/item.html?id=4
+            var thisURL = document.URL;      
+            var item_id = (thisURL.split("?")[1]).split("=")[1];  
+
+            /* 获取此商品详细信息 */
+                
+            $.ajax({
+                method: "GET",
+                url: "http://localhost:9000/item/get/" + item_id,
+                // contentType: "application/x-www-form-urlencoded",
+                // withCreditial: true,
+                success: function(res) {
+                    if(res.status == "success"){
+                        // alert("商品信息加载成功");    
+                        item = res.data;
+                        console.log(item);
+                        // 刷新页面
+                        reloadDom();
+                    }      
+                    if(res.status == "fail")
+                        alert(res.data.errorMsg);
+                },
+                error: function(){
+                    alert("操作失败，请重试");
+                }
+            });
+
+            // 重新加载页面
+            function reloadDom(){
+                $("#label_title").text(item.title);
+                $("#img_url").attr("src", item.imgUrl);
+                $("#label_description").text(item.description);
+                $("#label_price").text(item.price);
+                $("#label_sales").text(item.sales);
+                $("#label_stock").text(item.stock);
+                // 秒杀活动未开始
+                if(item.promoStatus == 1){
+                    // 设置秒杀价格
+                    $("#label_miaosha_price").text(item.promoPrice);
+                    // 不允许下单
+                    $("#btn_order_create").attr("disabled", true);
+                    // 关闭上一个定时器
+                    clearInterval(intervalId);
+                    // 每隔一秒刷新一次
+                    intervalId = setInterval(function(){
+                        //获取当前时间
+                        var dateBegin = new Date();
+                        // 获取开始时间
+                        var promoStartTime = item.promoStartTime;
+                        //如果时间格式是yyyy/MM/dd，那下面这一步转化时间格式就可以不用了
+                        var dateEnd = new Date(promoStartTime.replace(/-/g, "/"));//将-转化为/，使用new Date
+                        //时间差的毫秒数
+                        var haomiao = dateEnd.getTime() - dateBegin.getTime();
+                        if(haomiao < 0){
+                            // 秒杀开始
+                            item.promoStatus = 2;
+                            reloadDom();
+                            return;
+                        }
+                        // 更新提示信息
+                        $("#label_miaosha_message").text("秒杀活动将于 " + promoStartTime + " 准时开始，距离活动开始还有 " + timeFn(haomiao));
+                    }, 1000);
+                }else if(item.promoStatus == 2){
+                    // 关闭倒计时定时器
+                    clearInterval(intervalId);
+                    // 秒杀活动正在进行
+                    $("#label_miaosha_message").text("秒杀正在进行，将于 " + item.promoEndTime + " 结束");
+                    // 隐藏平时价格，显示秒杀价格
+                    $("#div_item_price").hide();
+                    $("#label_miaosha_price").text(item.promoPrice);
+                    $("#btn_order_create").attr("disabled", false);
+                }else{
+                    // 无秒杀活动
+                    // 隐藏与秒杀有关的div
+                    $("#div_miaosha_message").hide();
+                    $("#div_miaosha_price").hide();
+                    $("#btn_order_create").attr("disabled", false);
+                }
+            }
+
+            /* 点击下单 */
+            $("#btn_order_create").click(function(){
+                // 获取输入的数目
+                var amount = parseInt($("#input_amount").val());
+                if(isNaN(amount) || amount < 0 || amount > 99){
+                    alert("请输入合法数量(0-99)");
+                } 
+                $.ajax({
+                    method: "POST",
+                    url: "http://localhost:9000/order/create",
+                    data: {
+                        "itemId": item_id,
+                        "amount": amount,
+                        "promoId": item.promoId
+                    },
+                    // contentType: "application/x-www-form-urlencoded",
+                    // 允许session跨域共享
+                    xhrFields: {withCredentials: true},
+                    success: function(res) {
+                        if(res.status == "success"){
+                            alert("下单成功");    
+                            item = res.data;
+                            location.reload();
+                        }      
+                        if(res.status == "fail"){
+                            alert(res.data.errorMsg);
+                            // 用户未登录
+                            if(res.data.errorCode == 10004){
+                                window.location.href="login.html";
+                            }else{
+                                // 刷新页面，如错误原因为促销结束，刷新即可
+                                location.reload();
+                            }
+                        }      
+                    },
+                    error: function(){
+                        alert("操作失败，请重试");
+                    }
+                });    
+            });
+
+            // 把毫秒数转为 xx天xx小时xx分xx秒
+            function timeFn(haomiao) {//活动开始时间 作为一个变量传进来
+                var dayDiff = Math.floor(haomiao / (24 * 3600 * 1000));//计算出相差天数
+                var leave1 = haomiao % (24 * 3600 * 1000);    //计算天数后剩余的毫秒数
+                var hours = Math.floor(leave1 / (3600 * 1000));//计算出小时数
+                //计算相差分钟数
+                var leave2 = leave1 % (3600 * 1000);    //计算小时数后剩余的毫秒数
+                var minutes = Math.floor(leave2 / (60 * 1000));//计算相差分钟数
+                //计算相差秒数
+                var leave3 = leave2 % (60 * 1000);      //计算分钟数后剩余的毫秒数
+                var seconds = Math.round(leave3 / 1000);
+                var result = dayDiff + " 天 " + hours + " 小时 " + minutes + " 分钟 " + seconds + " 秒";
+                console.log(" 相差 "+dayDiff+"天 "+hours+"小时 "+minutes+" 分钟"+seconds+" 秒")
+                console.log(haomiao+"时间差的毫秒数",dayDiff+"计算出相差天数",leave1+"计算天数后剩余的毫秒数"
+                    ,hours+"计算出小时数",minutes+"计算相差分钟数",seconds+"计算相差秒数");
+                return result;
+            }
+           
+        })
+    </script>
+</body>
+</html>
